@@ -108,7 +108,7 @@ def read_arduino(ser)
         humidity = int.from_bytes(ser_msg[4], byteorder='little')        # 습도 값
         humidifier = int.from_bytes(ser_msg[5], byteorder='little')      # 가습기 on/off
         dehumidifier = int.from_bytes(ser_msg[6], byteorder='little')    # 제습기 on/off
-        air = struct.unpack('<f', m[7])[0]                               # 미세먼지 값
+        air = struct.unpack('<f', ser_msg[7])[0]                         # 미세먼지 값
         fan = int.from_bytes(ser_msg[8], byteorder='little')             # 환풍기 on/off
         gasvalve = int.from_bytes(ser_msg[9], byteorder='little')        # 가스밸브 on/off
         livingroom = int.from_bytes(ser_msg[10], byteorder='little')     # 거실 led on/off
