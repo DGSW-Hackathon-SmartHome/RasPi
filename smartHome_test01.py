@@ -14,8 +14,7 @@ def on_message(client, userdata, msg):
         if msg.topic == 'smarthome/sensor/temperature':
             if j['type'] == 'aircon':
                 if j['cmd'] == 'on':
-                    print("aricon on")
-                    #arduino.write(b'A')
+                    arduino.write(b'A')
                 else:
                     arduino.write(b'a')
             elif j['type'] == 'boiler':
