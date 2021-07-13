@@ -2,11 +2,15 @@ import serial
 import time
 import paho.mqtt.client as mqtt
 import json
+import re
+import struct
 
+#mqtt connect setting
 def on_connect(client, userdata, flags, rc):
     print('connected')
     client.subscribe('smarthome/#')
 
+#mqtt subscribe msg
 def on_message(client, userdata, msg):
     print(msg.topic, msg.payload)
     try:
@@ -52,6 +56,7 @@ def on_message(client, userdata, msg):
         print(e)
         pass
 
+#mqtt client setting
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
@@ -59,11 +64,41 @@ client.on_message = on_message
 client.connect('3.34.177.215', 1883)
 client.loop_start()
 
+# 아두이노로부터 센서 값 받아오기
+regex = b'^T(.{2})H(.{2})A(.{4})G(.{3})\n$'
+def read_arduino(ser)
+    ser_msg = re.match(regex, ser.readline())
+    if ser_msg is not None:
+        temperature = int.from_bytes(ser_msg[1], byteorder='little')
+        humidity = int.from_bytes(ser_msg[2], byteorder='little')
+        air = struct.unpack('<f', m[3])[0]
+        gasvalve = ser_msg[4].decode('utf-8')
+
+        return {
+            'humidity': humidity,
+            'temperature': temperature,
+            'air': air,
+            'gasvalve': gasvalve
+        }
+    else:
+        return None
+
 try:
-    print("실행")
+    global arduino
+    arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+
+    arduino.flushInput()
     while True:
+        data = read_arduino(arduino)
+        if data is not None:
+            print('{humidity}% / {temperature}°C / Air: {air:.2f}ppm / gasValve: {gasValve}'.format(**data))
+
+            client.publish('smartfarm/value', json.dumps(data))
+
         client.loop_read()
         time.sleep(1)    
+
+    arduino.close()
 
 except KeyboardInterrupt:
     pass
