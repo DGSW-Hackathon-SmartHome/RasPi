@@ -148,7 +148,7 @@ try:
         if data is not None:
             print('{temperature}°C / {humidity}% / Air: {air:.2f}ppm / aircon: {aircon}'.format(**data))
 
-            client.publish('smartfarm/value', json.dumps(data))
+            client.publish('smarthome/value', json.dumps(data))
 
         client.loop_read()
         time.sleep(1)
